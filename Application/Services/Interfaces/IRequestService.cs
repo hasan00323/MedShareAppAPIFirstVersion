@@ -14,6 +14,7 @@ namespace Application.Services.Interfaces
         Task<IEnumerable<Request>> GetUnAvailableRequests();
         Task<IEnumerable<Request>> GetRejectedRequests();
         Task RejectRequestAsync(int requestId);
+        Task<IEnumerable<Request>> GatAllAprovedRequest();
     }
 
 }

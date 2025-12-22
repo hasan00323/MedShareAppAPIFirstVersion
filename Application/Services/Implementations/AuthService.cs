@@ -38,8 +38,10 @@ namespace Application.Services
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto input)
         {
             var user = await _userRepo.GetAll()
-            .Include(u => u.MyRequests).Include(x => x.MyDonations)
-            .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == input.Email.Trim().ToLower());
+                  .FirstOrDefaultAsync(u =>
+                      u.Email != null &&
+                      u.Email.ToLower() == input.Email.Trim().ToLower());
+
 
             if (user == null)
             {
@@ -97,26 +99,13 @@ namespace Application.Services
             await _userRepo.Insert(newUser);
             await _userRepo.SaveChanges(); 
 
-            var accessToken = GenerateAccessToken(newUser);
-            var refreshToken = GenerateRefreshToken();
-
-            await _refreshTokenRepo.Insert(new RefreshToken
-            {
-                Token = refreshToken,
-                UserId = newUser.UserId,
-                Expires = DateTime.UtcNow.AddDays(7)
-            });
-
-            await _refreshTokenRepo.SaveChanges();
-
+          
             return new RegisterResponseDto
             {
                 UserId = newUser.UserId,
                 FullName = newUser.FullName,
                 Email = newUser.Email,
                 Role = newUser.Role,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
             };
         }
 
@@ -148,8 +137,8 @@ namespace Application.Services
             {
                 FullName = user.FullName,
                 Email = user.Email,
-                CurrentPassword= user.Password,
-                NewPassword=null,
+
+
             };
         }
 
@@ -165,7 +154,7 @@ namespace Application.Services
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("Role", user.Role.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 
 

@@ -24,5 +24,6 @@ namespace Domain.Entities
         public User? Donor { get; set; }
 
         public int? Receiver { get; set; }
+        public int? UserAssignedTo { get; set; }
     }
 }

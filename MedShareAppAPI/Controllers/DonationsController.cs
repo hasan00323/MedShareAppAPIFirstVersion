@@ -1,9 +1,7 @@
 ﻿using Application.DTOs.Auth.Requests.GetDonation;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MedShareAppAPI.Controllers
 {
@@ -31,7 +29,7 @@ namespace MedShareAppAPI.Controllers
         [HttpPut("{donationId}/approve")]
         public async Task<IActionResult> ApproveDonation(GetDonationRequestDto requested)
         {
-            await _donationService.ApproveDonationRequestAsync(requested.DonationId,requested.Quantity);
+            await _donationService.ApproveDonationRequestAsync(requested.DonationId,requested.Quantity,requested.UserId);
             return Ok("Donation approved");
         }
 
@@ -43,6 +41,17 @@ namespace MedShareAppAPI.Controllers
             await _donationService.RejectDonationRequestAsync(donationId);
             return Ok("Donation rejected");
         }
+    
+    
+        [Authorize]
+        [HttpPost("{donationId}/add-to-cart")]
+        public async Task<IActionResult> AddDonationToCart(int donationId)
+        {
+            await _donationService.AddDonationToCart(donationId);
+            return Ok("Donation added to cart");
+        }
+       
+
     }
 
 }

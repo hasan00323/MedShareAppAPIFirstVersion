@@ -53,6 +53,9 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("Receiver")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserAssignedTo")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 

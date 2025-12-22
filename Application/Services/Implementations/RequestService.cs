@@ -5,12 +5,6 @@ using Application.Services.Interfaces;
 using Domain.Entities;
 using Domain.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Application.Services.Implementations
 {
@@ -128,6 +122,11 @@ namespace Application.Services.Implementations
                 .AsEnumerable());
         }
 
+        public async Task<IEnumerable<Request>> GatAllAprovedRequest()
+        {
+            return await _RequestRepository.GetAll()
+                .Where(r => r.Status == StatusDonation.Approved).ToListAsync();
+        }
         public async Task RejectRequestAsync(int requestId)
         {
             var request = await _RequestRepository.GetById(requestId);

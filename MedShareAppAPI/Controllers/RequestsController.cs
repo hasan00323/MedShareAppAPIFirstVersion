@@ -3,7 +3,6 @@ using Application.DTOs.Auth.Requests.RequestMedicine;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MedShareAppAPI.Controllers
 {
@@ -69,6 +68,12 @@ namespace MedShareAppAPI.Controllers
         {
             await _requestService.RejectRequestAsync(requestId);
             return Ok("Request rejected");
+        }
+        [Authorize]
+        [HttpGet("AllAprovedRequest")]
+        public async Task<IActionResult> AllAprovedRequest()
+        {
+            return Ok(await _requestService.GatAllAprovedRequest());
         }
     }
 }

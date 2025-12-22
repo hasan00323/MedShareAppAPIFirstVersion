@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
 [ApiController]
+
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -42,12 +43,6 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("RefreshToken")]
-    public async Task<IActionResult> RefreshToken(string refreshToken)
-    {
-        var accessToken = await _authService.RefreshToken(refreshToken);
-        return Ok(accessToken);
-    }
 
     [HttpGet("Profile")]
     public async Task<IActionResult> UserProfile()
