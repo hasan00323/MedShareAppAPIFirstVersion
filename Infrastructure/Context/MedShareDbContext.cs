@@ -12,6 +12,7 @@ public class MedShareDbContext : DbContext
     public DbSet<Donation> Donations { get; set; }
     public DbSet<Request> Requests { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<RequestTask> RequestTasks { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Request>()

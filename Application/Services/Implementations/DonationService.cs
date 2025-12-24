@@ -35,7 +35,7 @@ namespace Application.Services.Implementations
             await _donationRepo.SaveChanges();
         }
 
-        public async Task ApproveDonationRequestAsync(int donationId,int Quantity,int userId)//edited
+        public async Task ApproveDonationRequestAsync(int donationId,int Quantity,int userId)
         {
             var donation = await _donationRepo.GetById(donationId);
 
@@ -108,6 +108,7 @@ namespace Application.Services.Implementations
             _donationRepo.Update(donation);
             await _donationRepo.SaveChanges();
         }
+
 
     }
 

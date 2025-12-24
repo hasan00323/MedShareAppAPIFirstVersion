@@ -71,6 +71,7 @@ namespace Application.Services.Implementations
                 Quantity= dto.Quantity,
                 PhotoURL= dto.PhotoURL,
                 IsEquipment= true,
+                CreationDate= DateTime.UtcNow,
             };
 
             await _RequestRepository.Insert(request);
@@ -92,6 +93,7 @@ namespace Application.Services.Implementations
                 ExpirationDate = dto.ExpirationDate,
                 UnOpend = dto.UnOpend,
                 IsEquipment= false,
+                CreationDate = DateTime.UtcNow,
             };
 
             await _RequestRepository.Insert(request);

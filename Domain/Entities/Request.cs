@@ -1,8 +1,5 @@
 ﻿using Domain.Entities.Enum;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities
 {
@@ -41,5 +38,7 @@ namespace Domain.Entities
 
         public int? DonationId { get; set; }
         public Donation? Donation { get; set; }
+
+        public DateTime CreationDate { get; set; }
     }
 }
