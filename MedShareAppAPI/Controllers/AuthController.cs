@@ -2,6 +2,7 @@
 using Application.DTOs.Auth.Password;
 using Application.DTOs.Auth.Register;
 using Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/[controller]")]
@@ -43,14 +44,33 @@ public class AuthController : ControllerBase
         return Ok();
     }
 
-
-    [HttpGet("Profile")]
+    [Authorize(Roles = "User")]
+    [HttpGet("ProfileUser")]
     public async Task<IActionResult> UserProfile()
     {
         var response = await _authService.UserProfile();
         if (response == null)
             return Unauthorized();
 
+        return Ok(response);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("ProfileAdmin")]
+    public async Task<IActionResult> AdminProfile()
+    {
+        var response = await _authService.AdminProfile();
+        if (response == null)
+            return Unauthorized();
+
+        return Ok(response);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("getAllUsers")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var response = await _authService.GetAllUsers();
         return Ok(response);
     }
 }

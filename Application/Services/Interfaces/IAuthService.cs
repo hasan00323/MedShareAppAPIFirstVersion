@@ -12,9 +12,11 @@ namespace Application.Services.Interfaces
         Task<LoginResponseDto> LoginAsync(LoginRequestDto input);
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto input);
         Task<UserProfileDto> UserProfile();
+        Task<UserProfileDto> AdminProfile();
         string GenerateAccessToken(User user);
         string GenerateRefreshToken();
         Task ResetPassword(ResetPasswordDto input);
         Task<string> RefreshToken(string refreshToken);
+        Task<int> GetAllUsers();
     }
 }

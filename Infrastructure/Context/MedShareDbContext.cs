@@ -9,27 +9,37 @@ public class MedShareDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Donation> Donations { get; set; }
-    public DbSet<Request> Requests { get; set; }
+    public DbSet<DonationEquipment> DonationEquipments { get; set; }
+    public DbSet<DonationMedicine> DonationMedicines { get; set; }
+    public DbSet<RequestMedicine> RequestMedicines { get; set; }
+    public DbSet<RequestEquipment> RequestEquipments { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<RequestTask> RequestTasks { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Request>()
-            .HasOne(r => r.Donation)
-            .WithMany()
-            .HasForeignKey(r => r.DonationId)
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<DonationEquipment>()
+            .HasOne(d => d.User)
+            .WithMany(u => u.MyDonationEquipments)
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<DonationMedicine>()
+            .HasOne(d => d.User)
+            .WithMany(u => u.MyDonationMedicines)
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RequestMedicine>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.MyRequestMedicines)
+            .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Donation>()
-            .HasOne(d => d.Donor)
-            .WithMany(u => u.MyDonations)
-            .HasForeignKey(d => d.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Request>()
+        modelBuilder.Entity<RequestEquipment>()
             .HasOne(r => r.User)
-            .WithMany(u => u.MyRequests)
+            .WithMany(u => u.MyRequestEquipments)
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.NoAction);
     }

@@ -132,16 +132,32 @@ namespace Application.Services
         {
             var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userId = Convert.ToInt32(userIdClaim);
-            var user = await _userRepo.GetAll().FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _userRepo.GetAll().FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.User);
             return new UserProfileDto
             {
                 FullName = user.FullName,
                 Email = user.Email,
-
-
+                ImageProfile = user.ImageProfile
             };
         }
 
+        public async Task<UserProfileDto> AdminProfile()
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = Convert.ToInt32(userIdClaim);
+            var user = await _userRepo.GetAll().FirstOrDefaultAsync(u => u.UserId == userId && u.Role==Role.Admin);
+            return new UserProfileDto
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                ImageProfile = user.ImageProfile
+            };
+        }
+
+        public async Task<int> GetAllUsers()
+        {
+            return await _userRepo.GetAll().CountAsync();
+        } 
 
         //=========================================================================================== For Token Generation
         public string GenerateAccessToken(User user)

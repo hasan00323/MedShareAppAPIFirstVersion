@@ -9,6 +9,7 @@ namespace Domain.Entities.Enum
     public enum equStatus
     {
         New = 1,
-        Used
+        LikeNew,
+        Used,
     }
 }

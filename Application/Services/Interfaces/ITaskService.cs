@@ -1,5 +1,4 @@
-﻿
-using Application.DTOs.Requests.TaskRequests;
+﻿using Application.DTOs.Requests.TaskRequests;
 using Domain.Entities;
 
 namespace Application.Services.Interfaces
@@ -10,5 +9,6 @@ namespace Application.Services.Interfaces
         Task CancelTaskAsync(int taskId);
         Task<IEnumerable<RequestTask>> GetAllTasksAsync();
         Task<RequestTask?> GetTaskDetailsAsync(int taskId);
+  
     }
 }

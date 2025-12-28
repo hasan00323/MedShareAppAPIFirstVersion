@@ -17,9 +17,13 @@ namespace Domain.Entities
         public string? Password { get; set; }
 
         public string? PhoneNumber { get; set; }
+
+        public string? ImageProfile { get; set; }
         public Role Role { get; set; }
-        public ICollection<Donation>? MyDonations { get; set; }
-        public ICollection<Request>? MyRequests { get; set; }
+        public ICollection<DonationEquipment>? MyDonationEquipments { get; set; }
+        public ICollection<DonationMedicine>? MyDonationMedicines { get; set; }
+        public ICollection<RequestMedicine>? MyRequestMedicines { get; set; }
+        public ICollection<RequestEquipment>? MyRequestEquipments { get; set; }
     }
    
 }

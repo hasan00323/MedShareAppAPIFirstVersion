@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MedShareDbContext))]
-    partial class MedShareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251228145238_editAllTables2")]
+    partial class editAllTables2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Accessories")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("AddedToCart")
-                        .HasColumnType("bit");
 
                     b.Property<int>("AssignStatus")
                         .HasColumnType("int");
@@ -93,9 +93,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DonationMedicineId"));
-
-                    b.Property<bool>("AddedToCart")
-                        .HasColumnType("bit");
 
                     b.Property<int>("AssignStatus")
                         .HasColumnType("int");

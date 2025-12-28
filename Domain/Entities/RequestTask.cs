@@ -7,15 +7,10 @@ namespace Domain.Entities
     {
         [Key]
         public int TaskId { get; set; }
-
-        public int RequestId { get; set; }
-        public Request Request { get; set; } = null!;
-
-        public int? DonationId { get; set; }
-        public Donation? Donation { get; set; }
-
+        public TimeOnly Time { get; set; }
+        public string Title { get; set; }
         public int AdminId { get; set; }
-        public User Admin { get; set; } = null!;
+        public User? User { get; set; } 
 
         public DateTime AssignedDate { get; set; }
         public DateTime DueDate { get; set; }
