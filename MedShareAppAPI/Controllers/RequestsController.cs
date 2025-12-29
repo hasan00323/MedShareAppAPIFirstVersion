@@ -1,5 +1,5 @@
-﻿using Application.DTOs.Auth.Requests.RequestEquipment;
-using Application.DTOs.Auth.Requests.RequestMedicine;
+﻿using Application.DTOs.AllRequests.Requests;
+using Application.DTOs.AllRequests.Requests.Carts;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,119 +18,125 @@ namespace MedShareAppAPI.Controllers
         }
 
         [Authorize]
-        [HttpPost("equipment")]
-        public async Task<IActionResult> CreateEquipmentRequest([FromBody] RequestEquipmentDto dto)
+        [HttpPost("createEquipmentRequest")]
+        public async Task<IActionResult> CreateEquipmentRequest([FromBody] RequestUploadEquipmentDto dto)
         {
             await _requestService.CreateEquipmentRequestAsync(dto);
             return Ok("Equipment request created successfully");
         }
 
         [Authorize]
-        [HttpPost("medicine")]
-        public async Task<IActionResult> CreateMedicineRequest([FromBody] RequestMedicineDto dto)
+        [HttpPost("createMedicineRequest")]
+        public async Task<IActionResult> CreateMedicineRequest([FromBody] RequestUploadMedicineDto dto)
         {
             await _requestService.CreateMedicineRequestAsync(dto);
             return Ok("Medicine request created successfully");
         }
 
+       
         [Authorize(Roles = "Admin")]
-        [HttpGet("pendingEquipment")]
+        [HttpGet("getPendingEquipmentRequests")]
         public async Task<IActionResult> GetPendingEquipmentRequests()
         {
             return Ok(await _requestService.GetPendingEquipmentRequests());
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("pendingMedicine")]
+        [HttpGet("getPendingMedicineRequests")]
         public async Task<IActionResult> GetPendingMedicineRequests()
         {
             return Ok(await _requestService.GetPendingMedicineRequests());
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("unavailableEquipment")]
-        public async Task<IActionResult> GetUnAvailableEquipmentRequests()
+        [HttpGet("getUnavailableEquipmentRequests")]
+        public async Task<IActionResult> GetUnavailableEquipmentRequests()
         {
-            return Ok( await _requestService.GetUnavailableEquipmentRequests());
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpGet("unavailableMedicine")]
-        public async Task<IActionResult> GetUnAvailableMedicineRequests()
-        {
-            return Ok( await _requestService.GetUnavailableMedicineRequests());
+            return Ok(await _requestService.GetUnavailableEquipmentRequests());
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("getUnavailableMedicineRequests")]
+        public async Task<IActionResult> GetUnavailableMedicineRequests()
+        {
+            return Ok(await _requestService.GetUnavailableMedicineRequests());
+        }
+
+     
+        [Authorize(Roles = "Admin")]
+        [HttpPut("approveEquipmentRequest")]
+        public async Task<IActionResult> ApproveEquipmentRequest([FromBody] RequestDto dto)
+        {
+            await _requestService.ApproveEquipmentRequestAsync(dto);
+            return Ok("Request approved and donation created");
+        }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{requestId}/approveEquipment")]
-        public async Task<IActionResult> ApproveEquipmentRequest(int requestId)
+        [HttpPut("approveMedicineRequest")]
+        public async Task<IActionResult> ApproveMedicineRequest([FromBody] RequestDto dto)
         {
-            await _requestService.ApproveEquipmentRequestAsync(requestId);
+            await _requestService.ApproveMedicineRequestAsync(dto);
             return Ok("Request approved and donation created");
         }
 
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{requestId}/approveMedicine")]
-        public async Task<IActionResult> ApproveMedicineRequest(int requestId)
+        [HttpPut("rejectEquipmentRequest")]
+        public async Task<IActionResult> RejectEquipmentRequest([FromBody] RequestDto dto)
         {
-            await _requestService.ApproveMedicineRequestAsync(requestId);
-            return Ok("Request approved and donation created");
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{requestId}/rejectEquipment")]
-        public async Task<IActionResult> RejectEquipmentRequest(int requestId)
-        {
-            await _requestService.RejectEquipmentRequestAsync(requestId);
+            await _requestService.RejectEquipmentRequestAsync(dto);
             return Ok("Request rejected");
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{requestId}/rejectMedicine")]
-        public async Task<IActionResult> RejectMedicineRequest(int requestId)
+        [HttpPut("rejectMedicineRequest")]
+        public async Task<IActionResult> RejectMedicineRequest([FromBody] RequestDto dto)
         {
-            await _requestService.RejectMedicineRequestAsync(requestId);
+            await _requestService.RejectMedicineRequestAsync(dto);
             return Ok("Request rejected");
         }
 
         [Authorize(Roles = "User")]
-        [HttpPut("{donationEquipmentId}/addEquipmentToCart")]
-        public async Task<IActionResult> AddEquipmentToCart(int donationEquipmentId)
+        [HttpPut("addEquipmentToCart")]
+        public async Task<IActionResult> AddEquipmentToCart([FromBody] AddToCartDto dto)
         {
-            await _requestService.AddEquipmentToCartAsync(donationEquipmentId);
+            await _requestService.AddEquipmentToCartAsync(dto);
             return Ok("Equipment added to cart");
         }
-        
+
         [Authorize(Roles = "User")]
-        [HttpPut("{donationMedicineId}/addMedicineToCart")]
-        public async Task<IActionResult> AddMedicineToCart(int donationMedicineId)
+        [HttpPut("addMedicineToCart")]
+        public async Task<IActionResult> AddMedicineToCart([FromBody] AddToCartDto dto)
         {
-            await _requestService.AddMedicineToCartAsync(donationMedicineId);
+            await _requestService.AddMedicineToCartAsync(dto);
             return Ok("Medicine added to cart");
         }
+
         [Authorize(Roles = "User")]
-        [HttpPut("{donationEquipmentId}/removeEquipmentFromCart")]
-        public async Task<IActionResult> RemoveEquipmentFromCart(int donationEquipmentId)
+        [HttpPut("removeEquipmentFromCart")]
+        public async Task<IActionResult> RemoveEquipmentFromCart(
+            [FromBody] AddToCartDto dto)
         {
-            await _requestService.RemoveEquipmentFromCartAsync(donationEquipmentId);
+            await _requestService.RemoveEquipmentFromCartAsync(dto);
             return Ok("Equipment removed from cart");
         }
 
         [Authorize(Roles = "User")]
-        [HttpPut("{donationMedicineId}/removeMedicineFromCart")]
-        public async Task<IActionResult> RemoveMedicineFromCart(int donationMedicineId)
+        [HttpPut("removeMedicineFromCart")]
+        public async Task<IActionResult> RemoveMedicineFromCart(
+            [FromBody] AddToCartDto dto)
         {
-            await _requestService.RemoveMedicineFromCartAsync(donationMedicineId);
+            await _requestService.RemoveMedicineFromCartAsync(dto);
             return Ok("Medicine removed from cart");
         }
 
+
         [Authorize(Roles = "Admin")]
-        [HttpGet("allUnavailableDonationRequests")]
+        [HttpGet("getAllUnavailableDonationRequests")]
         public async Task<IActionResult> AllUnavailableDonationRequests()
         {
-            var count = await _requestService.AllUnavailableDonationRequests();
-            return Ok(count);
+            return Ok(await _requestService.AllUnavailableDonationRequests());
         }
     }
+
 }

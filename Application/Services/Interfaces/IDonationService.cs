@@ -1,13 +1,15 @@
-﻿namespace Application.Services.Interfaces
+﻿using Application.DTOs.AllRequests.Donations;
+
+namespace Application.Services.Interfaces
 {
     public interface IDonationService
     {
-        Task RequestEquipmentAsync(int donationId);
-        Task RequestMedicineAsync(int donationId);
-        Task ApproveAssignEquipmentAsync(int donationId, int quantity, int receiverUserId);
-        Task ApproveAssignMedicineAsync(int donationId, int quantity, int receiverUserId);
-        Task RejectEquipmentAsync(int donationId);
-        Task RejectMedicineAsync(int donationId);
+        Task RequestEquipmentAsync(RequestRejectDonationDto dto);
+        Task RequestMedicineAsync(RequestRejectDonationDto dto);
+        Task ApproveAssignEquipmentAsync(ApproveDonationDto dto);
+        Task ApproveAssignMedicineAsync(ApproveDonationDto dto);
+        Task RejectEquipmentAsync(RequestRejectDonationDto dto);
+        Task RejectMedicineAsync(RequestRejectDonationDto dto);
         Task<int> GetAllDonationsAsync();
     }
 

@@ -1,10 +1,11 @@
-﻿using Application.DTOs.Auth.Requests.RequestEquipment;
-using Application.DTOs.Auth.Requests.RequestMedicine;
+﻿using Application.DTOs.AllRequests.Requests;
+using Application.DTOs.AllRequests.Requests.Carts;
 using Application.Repositories.Interfaces;
 using Application.Services.Interfaces;
 using Domain.Entities;
 using Domain.Entities.Enum;
 using Microsoft.EntityFrameworkCore;
+using Application.Services.Interfaces.FileService;
 
 namespace Application.Services.Implementations
 {
@@ -14,22 +15,33 @@ namespace Application.Services.Implementations
         private readonly IGenericRepository<RequestMedicine> _requestMedicineRepo;
         private readonly IGenericRepository<DonationEquipment> _donationEquipmentRepo;
         private readonly IGenericRepository<DonationMedicine> _donationMedicineRepo;
+        private readonly IFileStorageService _fileStorageService;
+
 
         public RequestService(
             IGenericRepository<RequestEquipment> requestEquipmentRepo,
             IGenericRepository<RequestMedicine> requestMedicineRepo,
             IGenericRepository<DonationEquipment> donationEquipmentRepo,
-            IGenericRepository<DonationMedicine> donationMedicineRepo)
+            IGenericRepository<DonationMedicine> donationMedicineRepo,
+            IFileStorageService fileStorageService
+            )
         {
             _requestEquipmentRepo = requestEquipmentRepo;
             _requestMedicineRepo = requestMedicineRepo;
             _donationEquipmentRepo = donationEquipmentRepo;
             _donationMedicineRepo = donationMedicineRepo;
+            _fileStorageService = fileStorageService;
         }
 
-        public async Task CreateEquipmentRequestAsync(RequestEquipmentDto dto)
+        public async Task CreateEquipmentRequestAsync(RequestUploadEquipmentDto dto)
         {
-            var request = new RequestEquipment
+            var imagePaths = await _fileStorageService.UploadAsync(
+                            dto.Images,
+                            "Uploads/Requests/Equipments",
+                            minFiles: 1,
+                            maxFiles: 3
+                        );
+             var request = new RequestEquipment
             {
                 ItemName = dto.ItemName,
                 ItemDesc = dto.ItemDesc,
@@ -39,15 +51,24 @@ namespace Application.Services.Implementations
                 IsAvailable = dto.IsAvailable,
                 UserId = dto.UserId,
                 CreationDate = DateTime.UtcNow,
-                Status = StatusDonation.Pending
-            };
+                Status = StatusDonation.Pending,
+                Image1 = imagePaths[0],
+                Image2 = imagePaths[1],
+                Image3 = imagePaths[2],
+             };
 
             await _requestEquipmentRepo.Insert(request);
             await _requestEquipmentRepo.SaveChanges();
         }
 
-        public async Task CreateMedicineRequestAsync(RequestMedicineDto dto)
+        public async Task CreateMedicineRequestAsync(RequestUploadMedicineDto dto)
         {
+            var imagePaths = await _fileStorageService.UploadAsync(
+                           dto.Images,
+                           "Uploads/Requests/Medicines",
+                           minFiles: 1,
+                           maxFiles: 3
+                       );
             var request = new RequestMedicine
             {
                 ItemName = dto.ItemName,
@@ -60,16 +81,19 @@ namespace Application.Services.Implementations
                 IsAvailable = dto.IsAvailable,
                 UserId = dto.UserId,
                 CreationDate = DateTime.UtcNow,
-                Status = StatusDonation.Pending
+                Status = StatusDonation.Pending,
+                Image1 = imagePaths[0],
+                Image2 = imagePaths[1],
+                Image3 = imagePaths[2],
             };
 
             await _requestMedicineRepo.Insert(request);
             await _requestMedicineRepo.SaveChanges();
         }
 
-        public async Task ApproveEquipmentRequestAsync(int requestId)
+        public async Task ApproveEquipmentRequestAsync(RequestDto dto)
         {
-            var request = await _requestEquipmentRepo.GetById(requestId);
+            var request = await _requestEquipmentRepo.GetById(dto.RequestId);
             if (request == null) throw new Exception("Request not found");
 
             var donation = new DonationEquipment
@@ -77,12 +101,15 @@ namespace Application.Services.Implementations
                 ItemName = request.ItemName,
                 ItemDesc = request.ItemDesc,
                 Quantity = request.Quantity,
-                Condition = request.Condition ,
+                Condition = request.Condition,
                 Accessories = request.Accessories,
                 IsAvailable = request.IsAvailable,
                 UserId = request.UserId,
                 CreationDate = DateTime.UtcNow,
-                IsOrderd = false
+                IsOrderd = false,
+                Image1 = request.Image1,
+                Image2 = request.Image2,
+                Image3 = request.Image3
             };
 
             await _donationEquipmentRepo.Insert(donation);
@@ -93,11 +120,11 @@ namespace Application.Services.Implementations
             await _requestEquipmentRepo.SaveChanges();
         }
 
-        public async Task ApproveMedicineRequestAsync(int requestId)
+        public async Task ApproveMedicineRequestAsync(RequestDto dto)
         {
-            var request = await _requestMedicineRepo.GetById(requestId);
+            var request = await _requestMedicineRepo.GetById(dto.RequestId);
             if (request == null) throw new Exception("Request not found");
-
+           
             var donation = new DonationMedicine
             {
                 ItemName = request.ItemName,
@@ -110,7 +137,10 @@ namespace Application.Services.Implementations
                 IsAvailable = request.IsAvailable,
                 UserId = request.UserId,
                 CreationDate = DateTime.UtcNow,
-                IsOrderd = false
+                IsOrderd = false,
+                Image1 = request.Image1,
+                Image2 = request.Image2,
+                Image3 = request.Image3,
             };
 
             await _donationMedicineRepo.Insert(donation);
@@ -122,43 +152,74 @@ namespace Application.Services.Implementations
         }
 
 
-        public async Task RejectEquipmentRequestAsync(int requestId)
+        public async Task RejectEquipmentRequestAsync(RequestDto dto)
         {
-            var request = await _requestEquipmentRepo.GetById(requestId);
+            var request = await _requestEquipmentRepo.GetById(dto.RequestId);
             if (request == null) throw new Exception("Request not found");
 
             request.Status = StatusDonation.Rejected;
             await _requestEquipmentRepo.SaveChanges();
         }
 
-        public async Task RejectMedicineRequestAsync(int requestId)
+        public async Task RejectMedicineRequestAsync(RequestDto dto)
         {
-            var request = await _requestMedicineRepo.GetById(requestId);
+            var request = await _requestMedicineRepo.GetById(dto.RequestId);
             if (request == null) throw new Exception("Request not found");
 
             request.Status = StatusDonation.Rejected;
             await _requestMedicineRepo.SaveChanges();
         }
 
-        public async Task<List<RequestEquipment>> GetPendingEquipmentRequests()
-            => await _requestEquipmentRepo.GetAll()
+        public async Task<List<DonationRequestStatusDto>> GetPendingEquipmentRequests()
+        {
+            return await _requestEquipmentRepo.GetAll()
                 .Where(r => r.Status == StatusDonation.Pending)
+                .Select(r => new DonationRequestStatusDto
+                {
+                    ItemName = r.ItemName,
+                    Status = r.Status.Value
+                })
                 .ToListAsync();
+        }
 
-        public async Task<List<RequestMedicine>> GetPendingMedicineRequests()
-            => await _requestMedicineRepo.GetAll()
+
+        public async Task<List<DonationRequestStatusDto>> GetPendingMedicineRequests()
+        {
+            return await _requestMedicineRepo.GetAll()
                 .Where(r => r.Status == StatusDonation.Pending)
+                .Select(r => new DonationRequestStatusDto
+                {
+                    ItemName = r.ItemName,
+                    Status = r.Status.Value
+                })
                 .ToListAsync();
+        }
 
-        public async Task<List<RequestEquipment>> GetUnavailableEquipmentRequests()
-            => await _requestEquipmentRepo.GetAll()
-                .Where(r => !r.IsAvailable)
-                .ToListAsync();
 
-        public async Task<List<RequestMedicine>> GetUnavailableMedicineRequests()
-            => await _requestMedicineRepo.GetAll()
+        public async Task<List<DonationRequestStatusDto>> GetUnavailableEquipmentRequests()
+        {
+            return await _requestEquipmentRepo.GetAll()
                 .Where(r => !r.IsAvailable)
+                .Select(r => new DonationRequestStatusDto
+                {
+                    ItemName = r.ItemName,
+                    Status = r.Status.Value
+                })
                 .ToListAsync();
+        }
+
+
+        public async Task<List<DonationRequestStatusDto>> GetUnavailableMedicineRequests()
+        {
+            return await _requestMedicineRepo.GetAll()
+                .Where(r => !r.IsAvailable)
+                .Select(r => new DonationRequestStatusDto
+                {
+                    ItemName = r.ItemName,
+                    Status = r.Status.Value
+                })
+                .ToListAsync();
+        }
 
 
         public async Task<int> AllUnavailableDonationRequests()
@@ -170,33 +231,33 @@ namespace Application.Services.Implementations
         }
 
 
-        public async Task AddEquipmentToCartAsync(int donationEquipmentId)
+        public async Task AddEquipmentToCartAsync(AddToCartDto dto)
         {
-            var donation = await _donationEquipmentRepo.GetById(donationEquipmentId);
+            var donation = await _donationEquipmentRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
             donation.AddedToCart = true;
             _donationEquipmentRepo.Update(donation);
             await _donationEquipmentRepo.SaveChanges();
         }
-        public async Task AddMedicineToCartAsync(int donationMedicineId)
+        public async Task AddMedicineToCartAsync(AddToCartDto dto)
         {
-            var donation = await _donationMedicineRepo.GetById(donationMedicineId);
+            var donation = await _donationMedicineRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
             donation.AddedToCart = true;
             _donationMedicineRepo.Update(donation);
             await _donationMedicineRepo.SaveChanges();
         }
-        public async Task RemoveEquipmentFromCartAsync(int donationEquipmentId)
+        public async Task RemoveEquipmentFromCartAsync(AddToCartDto dto)
         {
-            var donation = await _donationEquipmentRepo.GetById(donationEquipmentId);
+            var donation = await _donationEquipmentRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
             donation.AddedToCart = false;
             _donationEquipmentRepo.Update(donation);
             await _donationEquipmentRepo.SaveChanges();
         }
-        public async Task RemoveMedicineFromCartAsync(int donationMedicineId)
+        public async Task RemoveMedicineFromCartAsync(AddToCartDto dto)
         {
-            var donation = await _donationMedicineRepo.GetById(donationMedicineId);
+            var donation = await _donationMedicineRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
             donation.AddedToCart = false;
             _donationMedicineRepo.Update(donation);

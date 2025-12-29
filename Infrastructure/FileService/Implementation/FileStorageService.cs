@@ -1,4 +1,4 @@
-﻿using Infrastructure.FileService.Interface;
+﻿using Application.Services.Interfaces.FileService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 

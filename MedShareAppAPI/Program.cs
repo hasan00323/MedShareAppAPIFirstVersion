@@ -1,11 +1,10 @@
 using Application.Repositories.Interfaces;
 using Application.Services;
 using Application.Services.Implementations;
-
-//using Application.Services.Implementations;
 using Application.Services.Interfaces;
+using Application.Services.Interfaces.FileService;
 using Infrastructure.FileService.Implementation;
-using Infrastructure.FileService.Interface;
+
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -98,6 +97,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 #endregion

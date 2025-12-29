@@ -1,7 +1,7 @@
-﻿using Application.DTOs.Requests.TaskRequests;
+﻿using Application.DTOs.AllRequests.TaskRequests;
+using Application.DTOs.Requests.TaskRequests;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MedShareAppAPI.Controllers
@@ -17,7 +17,7 @@ namespace MedShareAppAPI.Controllers
         {
             _taskService = taskService;
         }
-
+ 
         [HttpPost("assign")]
         public async Task<IActionResult> AssignTask([FromBody] CreateTaskDto dto)
         {
@@ -25,24 +25,30 @@ namespace MedShareAppAPI.Controllers
             return Ok("Task assigned successfully.");
         }
 
-        [HttpPut("cancel/{taskId}")]
-        public async Task<IActionResult> CancelTask(int taskId)
+        [HttpPut("cancel")]
+        public async Task<IActionResult> CancelTask([FromBody] TaskIdDto dto)
         {
-            await _taskService.CancelTaskAsync(taskId);
+            await _taskService.CancelTaskAsync(dto);
             return Ok("Task cancelled successfully.");
+        }
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateTask([FromBody] UpdateTaskDto dto)
+        {
+            await _taskService.UpdateTaskAsync(dto);
+            return Ok("Task updated successfully.");
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllTasks()
         {
-            var tasks = await _taskService.GetAllTasksAsync();
-            return Ok(tasks);
+            return Ok(await _taskService.GetAllTasksAsync());
         }
 
-        [HttpGet("{taskId}")]
-        public async Task<IActionResult> GetTaskDetails(int taskId)
+        [HttpPost("details")]
+        public async Task<IActionResult> GetTaskDetails([FromBody] TaskIdDto dto)
         {
-            var task = await _taskService.GetTaskDetailsAsync(taskId);
+            var task = await _taskService.GetTaskDetailsAsync(dto);
 
             if (task == null)
                 return NotFound("Task not found.");
@@ -50,4 +56,5 @@ namespace MedShareAppAPI.Controllers
             return Ok(task);
         }
     }
+
 }

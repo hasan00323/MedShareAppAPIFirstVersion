@@ -1,4 +1,5 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.DTOs.AllRequests.Donations;
+using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,69 +11,68 @@ namespace MedShareAppAPI.Controllers
     {
         private readonly IDonationService _donationService;
 
-        public DonationController(IDonationService service)
+        public DonationController(IDonationService donationService)
         {
-            _donationService = service;
+            _donationService = donationService;
         }
 
+
         [Authorize(Roles = "User")]
-        [HttpPost("{donationId}/requestEquipment")]
-        public async Task<IActionResult> RequestDonation(int donationId)
+        [HttpPost("requestEquipment")]
+        public async Task<IActionResult> RequestEquipment([FromBody] RequestRejectDonationDto dto)
         {
-            await _donationService.RequestEquipmentAsync(donationId);
+            await _donationService.RequestEquipmentAsync(dto);
             return Ok("Donation requested");
         }
 
         [Authorize(Roles = "User")]
-        [HttpPost("{donationId}/requestMedicine")]
-        public async Task<IActionResult> RequestMedicineDonation(int donationId)
+        [HttpPost("requestMedicine")]
+        public async Task<IActionResult> RequestMedicine([FromBody] RequestRejectDonationDto dto)
         {
-            await _donationService.RequestMedicineAsync(donationId);
+            await _donationService.RequestMedicineAsync(dto);
             return Ok("Donation requested");
         }
 
-
         [Authorize(Roles = "Admin")]
-        [HttpPut("approveEquipment/{donationId}/quantity/{quantity}/user/{userId}")]
-        public async Task<IActionResult> ApproveAssignEquipment(int donationId, int quantity, int userId)
+        [HttpPut("approveEquipment")]
+        public async Task<IActionResult> ApproveEquipment([FromBody] ApproveDonationDto dto)
         {
-            await _donationService.ApproveAssignEquipmentAsync(donationId, quantity, userId);
+            await _donationService.ApproveAssignEquipmentAsync(dto);
             return Ok("Donation approved");
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("approveMedicine/{donationId}/quantity/{quantity}/user/{userId}")]
-        public async Task<IActionResult> ApproveAssignMedicine(int donationId, int quantity, int userId)
+        [HttpPut("approveMedicine")]
+        public async Task<IActionResult> ApproveMedicine([FromBody] ApproveDonationDto dto)
         {
-            await _donationService.ApproveAssignMedicineAsync(donationId, quantity, userId);
+            await _donationService.ApproveAssignMedicineAsync(dto);
             return Ok("Donation approved");
         }
 
-
         [Authorize(Roles = "Admin")]
-        [HttpPut("{donationId}/rejectEquipment")]
-        public async Task<IActionResult> RejectEquipmentDonation(int donationId)
+        [HttpPut("rejectEquipment")]
+        public async Task<IActionResult> RejectEquipment([FromBody] RequestRejectDonationDto dto)
         {
-            await _donationService.RejectEquipmentAsync(donationId);
-            return Ok("Donation rejected");
-        }
-    
-    
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{donationId}/rejectMedicine")]
-        public async Task<IActionResult> RejectMedicineDonation(int donationId)
-        {
-            await _donationService.RejectMedicineAsync(donationId);
+            await _donationService.RejectEquipmentAsync(dto);
             return Ok("Donation rejected");
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("allDonations")]
+        [HttpPut("rejectMedicine")]
+        public async Task<IActionResult> RejectMedicine([FromBody] RequestRejectDonationDto dto)
+        {
+            await _donationService.RejectMedicineAsync(dto);
+            return Ok("Donation rejected");
+        }
+
+ 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("getAllDonations")]
         public async Task<IActionResult> GetAllDonations()
         {
             return Ok(await _donationService.GetAllDonationsAsync());
         }
-
     }
+
 
 }

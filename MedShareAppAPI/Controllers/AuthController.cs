@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Auth.Login;
 using Application.DTOs.Auth.Password;
+using Application.DTOs.Auth.Profile;
 using Application.DTOs.Auth.Register;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -55,6 +56,14 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize(Roles = "User")]
+    [HttpPut("user")]
+    public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileDto dto)
+    {
+        await _authService.UpdateUserProfileAsync(dto);
+        return Ok("User profile updated successfully");
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpGet("ProfileAdmin")]
     public async Task<IActionResult> AdminProfile()
@@ -64,6 +73,14 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         return Ok(response);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("admin")]
+    public async Task<IActionResult> UpdateAdminProfile([FromBody] UserProfileDto dto)
+    {
+        await _authService.UpdateAdminProfileAsync(dto);
+        return Ok("Admin profile updated successfully");
     }
 
     [Authorize(Roles = "Admin")]

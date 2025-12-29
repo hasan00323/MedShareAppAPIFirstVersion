@@ -1,10 +1,10 @@
-﻿using Application.DTOs.Auth;
-using Application.DTOs.Auth.Login;
+﻿using Application.DTOs.Auth.Login;
 using Application.DTOs.Auth.Password;
 using Application.DTOs.Auth.Profile;
 using Application.DTOs.Auth.Register;
 using Application.Repositories.Interfaces;
 using Application.Services.Interfaces;
+using Application.Services.Interfaces.FileService;
 using Domain.Entities;
 using Domain.Entities.Enum;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +17,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-
 namespace Application.Services
 {
     public class AuthService : IAuthService
@@ -26,13 +25,14 @@ namespace Application.Services
         private readonly IGenericRepository<User> _userRepo;
         private readonly IGenericRepository<RefreshToken> _refreshTokenRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public AuthService(IConfiguration config, IGenericRepository<User> userRepo, IHttpContextAccessor httpContextAccessor, IGenericRepository<RefreshToken> refreshTokenRepo)
+        private readonly IFileStorageService _fileStorageService;
+        public AuthService(IFileStorageService fileStorageService, IConfiguration config, IGenericRepository<User> userRepo, IHttpContextAccessor httpContextAccessor, IGenericRepository<RefreshToken> refreshTokenRepo)
         {
             _config = config;
             _userRepo = userRepo;
             _httpContextAccessor = httpContextAccessor;
             _refreshTokenRepo = refreshTokenRepo;
+            _fileStorageService = fileStorageService;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto input)
@@ -130,29 +130,128 @@ namespace Application.Services
 
         public async Task<UserProfileDto> UserProfile()
         {
-            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = _httpContextAccessor.HttpContext?
+                .User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("User not authenticated");
+
             var userId = Convert.ToInt32(userIdClaim);
-            var user = await _userRepo.GetAll().FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.User);
+
+            var user = await _userRepo.GetAll()
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.User);
+
+            if (user == null)
+                throw new Exception("User not found");
+
             return new UserProfileDto
             {
                 FullName = user.FullName,
                 Email = user.Email,
-                ImageProfile = user.ImageProfile
+                PhoneNumber = user.PhoneNumber,
+                GetProfileImage = user.ImageProfile
             };
         }
 
+
+        public async Task UpdateUserProfileAsync(UserProfileDto dto)
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?
+                .User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("User not authenticated");
+
+            var userId = Convert.ToInt32(userIdClaim);
+
+            var user = await _userRepo.GetAll()
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.User);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            if (dto.UploadProfileImage != null)
+            {
+                var imagePath = await _fileStorageService.UploadAsync(
+                    new List<IFormFile> { dto.UploadProfileImage },
+                    "Uploads/ProfilePhotos/Users",
+                    minFiles: 1,
+                    maxFiles: 1
+                );
+
+                user.ImageProfile = imagePath.First();
+            }
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            _userRepo.Update(user);
+            await _userRepo.SaveChanges();
+        }
+
+
         public async Task<UserProfileDto> AdminProfile()
         {
-            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIdClaim = _httpContextAccessor.HttpContext?
+                .User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("User not authenticated");
+
             var userId = Convert.ToInt32(userIdClaim);
-            var user = await _userRepo.GetAll().FirstOrDefaultAsync(u => u.UserId == userId && u.Role==Role.Admin);
+
+            var admin = await _userRepo.GetAll()
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.Admin);
+
+            if (admin == null)
+                throw new Exception("Admin not found");
+
             return new UserProfileDto
             {
-                FullName = user.FullName,
-                Email = user.Email,
-                ImageProfile = user.ImageProfile
+                FullName = admin.FullName,
+                Email = admin.Email,
+                PhoneNumber = admin.PhoneNumber,
+            GetProfileImage = admin.ImageProfile
             };
         }
+
+        public async Task UpdateAdminProfileAsync(UserProfileDto dto)
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?
+                .User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("User not authenticated");
+
+            var userId = Convert.ToInt32(userIdClaim);
+
+            var admin = await _userRepo.GetAll()
+                .FirstOrDefaultAsync(u => u.UserId == userId && u.Role == Role.Admin);
+
+            if (admin == null)
+                throw new Exception("Admin not found");
+
+            if (dto.UploadProfileImage != null)
+            {
+                var imagePath = await _fileStorageService.UploadAsync(
+                    new List<IFormFile> { dto.UploadProfileImage },
+                    "Uploads/ProfilePhotos/Admins",
+                    minFiles: 1,
+                    maxFiles: 1
+                );
+
+                admin.ImageProfile = imagePath.First();
+            }
+
+            admin.FullName = dto.FullName;
+            admin.Email = dto.Email;
+            admin.PhoneNumber = dto.PhoneNumber;
+
+            _userRepo.Update(admin);
+            await _userRepo.SaveChanges();
+        }
+
 
         public async Task<int> GetAllUsers()
         {

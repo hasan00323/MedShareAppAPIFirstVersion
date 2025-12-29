@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Requests.TaskRequests;
+﻿using Application.DTOs.AllRequests.TaskRequests;
+using Application.DTOs.Requests.TaskRequests;
 using Application.Repositories.Interfaces;
 using Application.Services.Interfaces;
 using Domain.Entities;
@@ -29,25 +30,59 @@ namespace Application.Services.Implementations
             await _taskRepo.SaveChanges();
         }
 
-        public async Task CancelTaskAsync(int taskId)
+        public async Task CancelTaskAsync(TaskIdDto dto)
         {
-            var task = await _taskRepo.GetAll().FirstOrDefaultAsync(t => t.TaskId == taskId);
+            var task = await _taskRepo.GetAll().FirstOrDefaultAsync(t => t.TaskId == dto.TaskId);
 
-            if (task == null)  throw new Exception("Task not found");
+            if (task == null)  
+                
+                throw new Exception("Task not found");
 
             task.Status = TasksStatus.Cancelled;
 
             await _taskRepo.SaveChanges();
         }
 
-        public async Task<IEnumerable<RequestTask>> GetAllTasksAsync()
+        public async Task UpdateTaskAsync(UpdateTaskDto dto)
         {
-            return await _taskRepo.GetAll().ToListAsync();
+            var task = await _taskRepo.GetAll()
+                .FirstOrDefaultAsync(t => t.TaskId == dto.TaskId);
+
+            if (task == null)
+                throw new Exception("Task not found");
+
+            task.DueDate = dto.DueDate;
+            task.Notes = dto.Notes;
+            task.Status = dto.Status;
+
+            await _taskRepo.SaveChanges();
         }
 
-        public async Task<RequestTask?> GetTaskDetailsAsync(int taskId)
+        public async Task<List<TaskResponseDto>> GetAllTasksAsync()
         {
-            return await _taskRepo.GetAll().FirstOrDefaultAsync(t => t.TaskId == taskId);
+            return await _taskRepo.GetAll()
+                .Select(t => new TaskResponseDto
+                {
+                    TaskId = t.TaskId,
+                    DueDate = t.DueDate,
+                    Notes = t.Notes,
+                    Status = t.Status
+                })
+                .ToListAsync();
+        }
+
+        public async Task<TaskResponseDto?> GetTaskDetailsAsync(TaskIdDto dto)
+        {
+            return await _taskRepo.GetAll()
+                .Where(t => t.TaskId == dto.TaskId)
+                .Select(t => new TaskResponseDto
+                {
+                    TaskId = t.TaskId,
+                    DueDate = t.DueDate,
+                    Notes = t.Notes,
+                    Status = t.Status
+                })
+                .FirstOrDefaultAsync();
         }
     }
 

@@ -24,8 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Uploads\Donations\" />
-    <Folder Include="wwwroot\Uploads\ProfilePhotos\" />
+    <Folder Include="wwwroot\Uploads\Donations\Equipments\" />
+    <Folder Include="wwwroot\Uploads\Donations\Medicines\" />
+    <Folder Include="wwwroot\Uploads\ProfilePhotos\Admins\" />
+    <Folder Include="wwwroot\Uploads\ProfilePhotos\Usres\" />
+    <Folder Include="wwwroot\Uploads\Requests\Equipments\" />
+    <Folder Include="wwwroot\Uploads\Requests\Medicines\" />
   </ItemGroup>
 
 </Project>

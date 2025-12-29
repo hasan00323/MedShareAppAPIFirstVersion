@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Http;
+
 namespace Application.DTOs.Auth.Profile
 {
     public class UserProfileDto
@@ -6,6 +8,7 @@ namespace Application.DTOs.Auth.Profile
         public string FullName { get; set; }
         public string Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? ImageProfile { get; set; }
+        public IFormFile? UploadProfileImage { get; set; }
+        public string? GetProfileImage { get; set; }
     }
 }

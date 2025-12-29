@@ -1,4 +1,5 @@
-﻿using Application.Repositories.Interfaces;
+﻿using Application.DTOs.AllRequests.Donations;
+using Application.Repositories.Interfaces;
 using Application.Services.Interfaces;
 using Domain.Entities;
 using Domain.Entities.Enum;
@@ -35,10 +36,10 @@ namespace Application.Services.Implementations
             return Convert.ToInt32(claim);
         }
 
-        public async Task RequestEquipmentAsync(int donationId)
+        public async Task RequestEquipmentAsync(RequestRejectDonationDto dto)
         {
             var userId = GetCurrentUserId();
-            var donation = await _equipmentRepo.GetById(donationId);
+            var donation = await _equipmentRepo.GetById(dto.DonationId);
 
             if (donation == null)
                 throw new Exception("Donation not found");
@@ -54,10 +55,10 @@ namespace Application.Services.Implementations
             await _equipmentRepo.SaveChanges();
         }
 
-        public async Task RequestMedicineAsync(int donationId)
+        public async Task RequestMedicineAsync(RequestRejectDonationDto dto)
         {
             var userId = GetCurrentUserId();
-            var donation = await _medicineRepo.GetById(donationId);
+            var donation = await _medicineRepo.GetById(dto.DonationId);
 
             if (donation == null)
                 throw new Exception("Donation not found");
@@ -73,22 +74,22 @@ namespace Application.Services.Implementations
             await _medicineRepo.SaveChanges();
         }
 
-        public async Task ApproveAssignEquipmentAsync(int donationId, int quantity, int receiverUserId)
+        public async Task ApproveAssignEquipmentAsync(ApproveDonationDto dto)
         {
-            var donation = await _equipmentRepo.GetById(donationId);
+            var donation = await _equipmentRepo.GetById(dto.DonationId);
 
             if (donation == null)
                 throw new Exception("Donation not found");
 
-            if (donation.Quantity < quantity)
+            if (donation.Quantity < dto.Quantity)
                 throw new Exception("Quantity exceeds available amount");
 
             if (donation.UserAssignedTo != null)
                 throw new Exception("Donation already assigned");
 
-            donation.Quantity -= quantity;
+            donation.Quantity -= dto.Quantity;
             donation.AssignStatus = AssignStatus.AssigningApproved;
-            donation.UserAssignedTo = receiverUserId;
+            donation.UserAssignedTo = dto.ReceiverUserId;
 
             donation.IsAvailable = donation.Quantity > 0;
             donation.IsOrderd = false;
@@ -97,22 +98,22 @@ namespace Application.Services.Implementations
             await _equipmentRepo.SaveChanges();
         }
 
-        public async Task ApproveAssignMedicineAsync(int donationId, int quantity, int receiverUserId)
+        public async Task ApproveAssignMedicineAsync(ApproveDonationDto dto)
         {
-            var donation = await _medicineRepo.GetById(donationId);
+            var donation = await _medicineRepo.GetById(dto.DonationId);
 
             if (donation == null)
                 throw new Exception("Donation not found");
 
-            if (donation.Quantity < quantity)
+            if (donation.Quantity < dto.Quantity)
                 throw new Exception("Quantity exceeds available amount");
 
             if (donation.UserAssignedTo != null)
                 throw new Exception("Donation already assigned");
 
-            donation.Quantity -= quantity;
+            donation.Quantity -= dto.Quantity;
             donation.AssignStatus = AssignStatus.AssigningApproved;
-            donation.UserAssignedTo = receiverUserId;
+            donation.UserAssignedTo = dto.ReceiverUserId;
 
             donation.IsAvailable = donation.Quantity > 0;
             donation.IsOrderd = false;
@@ -121,9 +122,9 @@ namespace Application.Services.Implementations
             await _medicineRepo.SaveChanges();
         }
 
-        public async Task RejectEquipmentAsync(int donationId)
+        public async Task RejectEquipmentAsync(RequestRejectDonationDto dto)
         {
-            var donation = await _equipmentRepo.GetById(donationId);
+            var donation = await _equipmentRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
 
             donation.IsOrderd = false;
@@ -134,9 +135,9 @@ namespace Application.Services.Implementations
             await _equipmentRepo.SaveChanges();
         }
 
-        public async Task RejectMedicineAsync(int donationId)
+        public async Task RejectMedicineAsync(RequestRejectDonationDto dto)
         {
-            var donation = await _medicineRepo.GetById(donationId);
+            var donation = await _medicineRepo.GetById(dto.DonationId);
             if (donation == null) throw new Exception("Donation not found");
 
             donation.IsOrderd = false;

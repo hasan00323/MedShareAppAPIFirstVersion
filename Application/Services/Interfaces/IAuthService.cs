@@ -13,6 +13,8 @@ namespace Application.Services.Interfaces
         Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto input);
         Task<UserProfileDto> UserProfile();
         Task<UserProfileDto> AdminProfile();
+        Task UpdateUserProfileAsync(UserProfileDto dto);
+        Task UpdateAdminProfileAsync(UserProfileDto dto);
         string GenerateAccessToken(User user);
         string GenerateRefreshToken();
         Task ResetPassword(ResetPasswordDto input);

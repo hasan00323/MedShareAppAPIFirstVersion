@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Infrastructure.FileService.Interface
+namespace Application.Services.Interfaces.FileService
 {
     public interface IFileStorageService
     {

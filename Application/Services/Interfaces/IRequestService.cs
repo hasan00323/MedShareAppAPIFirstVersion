@@ -1,30 +1,29 @@
-﻿using Application.DTOs.Auth.Requests.RequestEquipment;
-using Application.DTOs.Auth.Requests.RequestMedicine;
-using Domain.Entities;
+﻿using Application.DTOs.AllRequests.Requests;
+using Application.DTOs.AllRequests.Requests.Carts;
 
 namespace Application.Services.Interfaces
 {
     public interface IRequestService
     {
-        Task CreateEquipmentRequestAsync(RequestEquipmentDto dto);
-        Task CreateMedicineRequestAsync(RequestMedicineDto dto);
+        Task CreateEquipmentRequestAsync(RequestUploadEquipmentDto dto);
+        Task CreateMedicineRequestAsync(RequestUploadMedicineDto dto);
 
-        Task ApproveEquipmentRequestAsync(int requestId);
-        Task ApproveMedicineRequestAsync(int requestId);
+        Task ApproveEquipmentRequestAsync(RequestDto dto);
+        Task ApproveMedicineRequestAsync(RequestDto dto);
 
-        Task RejectEquipmentRequestAsync(int requestId);
-        Task RejectMedicineRequestAsync(int requestId);
+        Task RejectEquipmentRequestAsync(RequestDto dto);
+        Task RejectMedicineRequestAsync(RequestDto dto);
 
-        Task<List<RequestEquipment>> GetPendingEquipmentRequests();
-        Task<List<RequestMedicine>> GetPendingMedicineRequests();
+        Task<List<DonationRequestStatusDto>> GetPendingEquipmentRequests();
+        Task<List<DonationRequestStatusDto>> GetPendingMedicineRequests();
 
-        Task<List<RequestEquipment>> GetUnavailableEquipmentRequests();
-        Task<List<RequestMedicine>> GetUnavailableMedicineRequests();
+        Task<List<DonationRequestStatusDto>> GetUnavailableEquipmentRequests();
+        Task<List<DonationRequestStatusDto>> GetUnavailableMedicineRequests();
 
-        Task AddEquipmentToCartAsync(int donationEquipmentId);
-        Task AddMedicineToCartAsync(int donationMedicineId);
-        Task RemoveEquipmentFromCartAsync(int donationEquipmentId);
-        Task RemoveMedicineFromCartAsync(int donationMedicineId);
+        Task AddEquipmentToCartAsync(AddToCartDto dto);
+        Task AddMedicineToCartAsync(AddToCartDto dto);
+        Task RemoveEquipmentFromCartAsync(AddToCartDto dto);
+        Task RemoveMedicineFromCartAsync(AddToCartDto dto);
 
         Task<int> AllUnavailableDonationRequests();
     }
